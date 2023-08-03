@@ -63,6 +63,23 @@ const items = [
         permiss: '1',
     },
     {
+        icon: 'Odometer',
+        title: '纬度管理',
+        permiss: '2',
+        subs: [
+            {
+                index: '/dimension/body-part',
+                title: '身体部位',
+                permiss: '2',
+            },
+            {
+                index: '/dimension/organ',
+                title: '器官',
+                permiss: '2',
+            },
+        ],
+    },
+    {
         icon: 'Calendar',
         index: '1',
         title: '表格相关',

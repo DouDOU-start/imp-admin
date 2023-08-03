@@ -22,6 +22,24 @@ const routes: RouteRecordRaw[] = [
                 component: () => import(/* webpackChunkName: "dashboard" */ '../views/dashboard.vue'),
             },
             {
+                path: '/dimension/body-part',
+                name: '',
+                meta: {
+                    title: '维度-身体部位',
+                    permiss: '2',
+                },
+                component: () => import(/* webpackChunkName: "table" */ '../views/dimension/body-part.vue'),
+            },
+            {
+                path: '/dimension/organ',
+                name: '',
+                meta: {
+                    title: '维度-器官',
+                    permiss: '2',
+                },
+                component: () => import(/* webpackChunkName: "table" */ '../views/dimension/organ.vue'),
+            },
+            {
                 path: '/table',
                 name: 'basetable',
                 meta: {

@@ -1,6 +1,7 @@
 import axios, {AxiosInstance, AxiosError, AxiosResponse, AxiosRequestConfig} from 'axios';
 
 const service:AxiosInstance = axios.create({
+    baseURL: '/api',
     timeout: 5000
 });
 

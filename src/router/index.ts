@@ -22,13 +22,13 @@ const routes: RouteRecordRaw[] = [
                 component: () => import(/* webpackChunkName: "dashboard" */ '../views/dashboard.vue'),
             },
             {
-                path: '/dimension/body-part',
+                path: '/dimension/bodypart',
                 name: '',
                 meta: {
                     title: '维度-身体部位',
                     permiss: '2',
                 },
-                component: () => import(/* webpackChunkName: "table" */ '../views/dimension/body-part.vue'),
+                component: () => import(/* webpackChunkName: "table" */ '../views/dimension/bodypart.vue'),
             },
             {
                 path: '/dimension/organ',
@@ -37,7 +37,16 @@ const routes: RouteRecordRaw[] = [
                     title: '维度-器官',
                     permiss: '2',
                 },
-                component: () => import(/* webpackChunkName: "table" */ '../views/dimension/organ.vue'),
+                component: () => import('../views/dimension/organ.vue'),
+            },
+            {
+                path: '/dimension/scantype',
+                name: '',
+                meta: {
+                    title: '维度-扫描类型',
+                    permiss: '2',
+                },
+                component: () => import('../views/dimension/scantype.vue'),
             },
             {
                 path: '/table',

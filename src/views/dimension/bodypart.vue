@@ -55,7 +55,7 @@
 import { ref, reactive } from 'vue';
 import { ElMessage, ElMessageBox } from 'element-plus';
 import { Delete, Edit, Search, Plus } from '@element-plus/icons-vue';
-import { BodyPartItem, fetchBodyPart, addBodyPart, editBodyPart, delBodyPart } from '../../api/dimension/body-part';
+import { BodyPartItem, fetchBodyPart, addBodyPart, editBodyPart, delBodyPart } from '../../api/dimension/bodypart';
 
 const query = reactive({
 	keyword: '',

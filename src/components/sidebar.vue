@@ -68,13 +68,18 @@ const items = [
         permiss: '2',
         subs: [
             {
-                index: '/dimension/body-part',
+                index: '/dimension/bodypart',
                 title: '身体部位',
                 permiss: '2',
             },
             {
                 index: '/dimension/organ',
                 title: '器官',
+                permiss: '2',
+            },
+            {
+                index: '/dimension/scantype',
+                title: '扫描类型',
                 permiss: '2',
             },
         ],

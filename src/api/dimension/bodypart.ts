@@ -10,7 +10,11 @@ export interface BodyPartItem {
 }
 
 export const fetchBodyPart = async (keyword: any, currentPage: number, pageSize: number): Promise<ApiResult<Page<BodyPartItem>>> => {
-    return await GET(`/dimension/bodyPart?keyword=${keyword}&currentPage=${currentPage}&pageSize=${pageSize}`);
+    return await GET('/dimension/bodyPart', {
+        "keyword": keyword,
+        "currentPage": currentPage, 
+        "pageSize": pageSize
+    });
 };
 
 export const addBodyPart = async (bodyName: string): Promise<ApiResult<number>> => {

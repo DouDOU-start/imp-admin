@@ -1,4 +1,4 @@
-import { createRouter, createWebHashHistory, RouteRecordRaw } from 'vue-router';
+import { createRouter, createWebHistory, RouteRecordRaw } from 'vue-router';
 import { usePermissStore } from '../store/permiss';
 import Home from '../views/home.vue';
 
@@ -17,16 +17,30 @@ const routes: RouteRecordRaw[] = [
                 name: 'dashboard',
                 meta: {
                     title: '系统首页',
-                    permiss: '1',
                 },
                 component: () => import(/* webpackChunkName: "dashboard" */ '../views/dashboard.vue'),
+            },
+            {
+                path: '/imp',
+                name: 'imp',
+                meta: {
+                    title: '影像中心',
+                },
+                component: () => import(/* webpackChunkName: "dashboard" */ '../views/imp/imp.vue'),
+            },
+            {
+                path: '/imp/:seriesId',
+                name: '',
+                meta: {
+                    title: '影像详情',
+                },
+                component: () => import(/* webpackChunkName: "dashboard" */ '../views/imp/series.vue'),
             },
             {
                 path: '/dimension/bodypart',
                 name: '',
                 meta: {
                     title: '维度-身体部位',
-                    permiss: '2',
                 },
                 component: () => import(/* webpackChunkName: "table" */ '../views/dimension/bodypart.vue'),
             },
@@ -35,7 +49,6 @@ const routes: RouteRecordRaw[] = [
                 name: '',
                 meta: {
                     title: '维度-器官',
-                    permiss: '2',
                 },
                 component: () => import('../views/dimension/organ.vue'),
             },
@@ -44,55 +57,54 @@ const routes: RouteRecordRaw[] = [
                 name: '',
                 meta: {
                     title: '维度-扫描类型',
-                    permiss: '2',
                 },
                 component: () => import('../views/dimension/scantype.vue'),
             },
-            {
-                path: '/table',
-                name: 'basetable',
-                meta: {
-                    title: '表格',
-                    permiss: '2',
-                },
-                component: () => import(/* webpackChunkName: "table" */ '../views/table.vue'),
-            },
-            {
-                path: '/charts',
-                name: 'basecharts',
-                meta: {
-                    title: '图表',
-                    permiss: '11',
-                },
-                component: () => import(/* webpackChunkName: "charts" */ '../views/charts.vue'),
-            },
-            {
-                path: '/form',
-                name: 'baseform',
-                meta: {
-                    title: '表单',
-                    permiss: '5',
-                },
-                component: () => import(/* webpackChunkName: "form" */ '../views/form.vue'),
-            },
-            {
-                path: '/tabs',
-                name: 'tabs',
-                meta: {
-                    title: 'tab标签',
-                    permiss: '3',
-                },
-                component: () => import(/* webpackChunkName: "tabs" */ '../views/tabs.vue'),
-            },
-            {
-                path: '/donate',
-                name: 'donate',
-                meta: {
-                    title: '鼓励作者',
-                    permiss: '14',
-                },
-                component: () => import(/* webpackChunkName: "donate" */ '../views/donate.vue'),
-            },
+            // {
+            //     path: '/table',
+            //     name: 'basetable',
+            //     meta: {
+            //         title: '表格',
+            //         permiss: '2',
+            //     },
+            //     component: () => import(/* webpackChunkName: "table" */ '../views/table.vue'),
+            // },
+            // {
+            //     path: '/charts',
+            //     name: 'basecharts',
+            //     meta: {
+            //         title: '图表',
+            //         permiss: '11',
+            //     },
+            //     component: () => import(/* webpackChunkName: "charts" */ '../views/charts.vue'),
+            // },
+            // {
+            //     path: '/form',
+            //     name: 'baseform',
+            //     meta: {
+            //         title: '表单',
+            //         permiss: '5',
+            //     },
+            //     component: () => import(/* webpackChunkName: "form" */ '../views/form.vue'),
+            // },
+            // {
+            //     path: '/tabs',
+            //     name: 'tabs',
+            //     meta: {
+            //         title: 'tab标签',
+            //         permiss: '3',
+            //     },
+            //     component: () => import(/* webpackChunkName: "tabs" */ '../views/tabs.vue'),
+            // },
+            // {
+            //     path: '/donate',
+            //     name: 'donate',
+            //     meta: {
+            //         title: '鼓励作者',
+            //         permiss: '14',
+            //     },
+            //     component: () => import(/* webpackChunkName: "donate" */ '../views/donate.vue'),
+            // },
             {
                 path: '/permission',
                 name: 'permission',
@@ -185,7 +197,7 @@ const routes: RouteRecordRaw[] = [
 ];
 
 const router = createRouter({
-    history: createWebHashHistory(),
+    history: createWebHistory(import.meta.env.BASE_URL),
     routes,
 });
 

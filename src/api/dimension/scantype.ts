@@ -10,7 +10,11 @@ export interface ScanTypeItem {
 }
 
 export const fetchScanType = async (keyword: any, currentPage: number, pageSize: number): Promise<ApiResult<Page<ScanTypeItem>>> => {
-    return await GET(`/dimension/scanType?keyword=${keyword}&currentPage=${currentPage}&pageSize=${pageSize}`);
+    return await GET('/dimension/scanType', {
+        "keyword": keyword,
+        "currentPage": currentPage, 
+        "pageSize": pageSize
+    });
 };
 
 export const addScanType = async (scanTypeName: string): Promise<ApiResult<number>> => {

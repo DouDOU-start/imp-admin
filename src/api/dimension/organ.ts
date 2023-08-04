@@ -10,7 +10,11 @@ export interface OrganItem {
 }
 
 export const fetchOrgan = async (keyword: any, currentPage: number, pageSize: number): Promise<ApiResult<Page<OrganItem>>> => {
-    return await GET(`/dimension/humanOrgan?keyword=${keyword}&currentPage=${currentPage}&pageSize=${pageSize}`);
+    return await GET('/dimension/humanOrgan', {
+        "keyword": keyword,
+        "currentPage": currentPage, 
+        "pageSize": pageSize
+    });
 };
 
 export const addOrgan = async (organName: string): Promise<ApiResult<number>> => {

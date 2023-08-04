@@ -26,7 +26,6 @@
                     class="mr10 handle-input" />
             </div>
             <el-button type="primary" :icon="Search" @click="handleSearch" class="btn">搜索</el-button>
-            <!-- <el-button type="primary" :icon="Plus">上传影像</el-button> -->
             <el-upload ref="upload" action="string" :before-upload="onBeforeUploadDicom" :http-request="uploadDicom"
                 :on-change="fileChange" multiple>
                 <el-button type="primary" class="btn">上传影像</el-button>
@@ -63,7 +62,7 @@
 </template>
 
 <script setup lang="ts" name="basetable">
-import { ref, reactive } from 'vue';
+import { ref, reactive, onMounted } from 'vue';
 import { ElMessage, ElMessageBox, ElNotification } from 'element-plus';
 import { Delete, Edit, Search, Plus, List, Download } from '@element-plus/icons-vue';
 import { SimpleSeriesItem, fetchSimpleSeries } from '../../api/imp/imp';
@@ -158,6 +157,10 @@ const getData = () => {
     });
 };
 
+onMounted(() => {
+  init()
+});
+
 const init = () => {
     loadInstitution();
     loadModality();
@@ -166,8 +169,6 @@ const init = () => {
     loadOrgan();
     getData();
 };
-
-init();
 
 // 查询操作
 const handleSearch = () => {

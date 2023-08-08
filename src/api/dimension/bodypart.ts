@@ -1,7 +1,7 @@
 import { ApiResult, DEL, GET, POST, PUT, Page } from "..";
 
 export interface BodyPartItem {
-    id: number;
+    id: string;
     bodyName: string;
     createdAt: string;
     updatedAt: string;

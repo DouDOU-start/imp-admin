@@ -1,4 +1,4 @@
-import { ApiResult, GET } from "..";
+import { ApiResult, GET, PUT } from "..";
 
 export interface SimpleSeriesParams {
     currentPage: number;
@@ -21,8 +21,8 @@ export interface SimpleSeriesItem {
 }
 
 export interface SeriesItem {
-    seriesNumber: string,
-    seriesUid: string,
+    seriesNumber: string
+    seriesUid: string
     seriesDescription: string,
     modality: string,
     pixelSpacing: string,
@@ -30,15 +30,23 @@ export interface SeriesItem {
     row: number,
     columns: number,
     instanceNum: number,
-    patientAge: string,
-    seriesAt: string,
-    institutionName: string,
-    patientNumber: string,
-    patientName: string,
-    patientSex: string,
-    shapeInfo: string,
-    sliceInfo: string,
-    bodyPart: string
+    patientAge: string
+    seriesAt: string
+    institutionName: string
+    patientNumber: string
+    patientName: string
+    patientSex: string
+    shapeInfo: string
+    sliceInfo: string
+    // bodyPart: number[],
+    // scanType: number[]
+    bodyPart: number,
+    scanType: number
+}
+
+export interface UpdateImpDimensionParams {
+    seriesId: string,
+    operates: any
 }
 
 export async function fetchSimpleSeries(params: SimpleSeriesParams): Promise<ApiResult<SimpleSeriesItem>> {
@@ -48,3 +56,12 @@ export async function fetchSimpleSeries(params: SimpleSeriesParams): Promise<Api
 export async function fetchSeries(seriesId: string): Promise<ApiResult<SeriesItem>> {
     return await GET(`/imp/series/${seriesId}`);
 }
+
+export async function updateImpBodyPartApi(params: UpdateImpDimensionParams) {
+    return await PUT("/imp/bodyPart", params);
+}
+
+export async function updateImpScanTypeApi(params: UpdateImpDimensionParams) {
+    return await PUT("/imp/scanType", params);
+}
+

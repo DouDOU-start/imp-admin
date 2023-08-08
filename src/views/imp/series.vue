@@ -78,6 +78,40 @@
                 </el-form>
             </div>
         </div>
+        <!--        上传标注文件-->
+        <el-upload class="upload-dicom" ref="upload" action="string" :http-request="uploadLabel" :on-change="fileChange"
+            multiple>
+            <el-button size="small" type="primary">上传标注文件</el-button>
+        </el-upload>
+        <!-- 标注文件表单 -->
+        <el-table :data="seriesLabel" border class="table" ref="multipleTable" header-cell-class-name="table-header">
+            <el-table-column prop="fileName" label="标注文件" align="center"></el-table-column>
+            <el-table-column prop="createdAt" label="上传时间" align="center"></el-table-column>
+            <el-table-column label="器官" align="center">
+                <template #default="scope">
+                    <el-select v-model="form.scanType" placeholder="暂无数据" :disabled="isEdit">
+                        <el-option v-for="item in scanType" :key="item.id" :label="item.scanTypeName" :value="item.id" />
+                    </el-select>
+                </template>
+            </el-table-column>
+            <el-table-column label="操作" width="350" align="center">
+                <template #default="scope">
+                    <el-button v-if="true" text :icon="Edit" @click="" v-permiss="16">
+                        编辑
+                    </el-button>
+                    <el-button v-else text :icon="Finished" @click="" v-permiss="16">
+                        保存
+                    </el-button>
+                    <el-button text :icon="Delete" class="red" @click="delLabel(scope.row.fileName)" v-permiss="16">
+                        删除
+                    </el-button>
+                    <el-button text :icon="Download" class="blue" @click="downloadLabel(scope.row.fileLocation, scope.row.fileName)"
+                        v-permiss="15">
+                        下载
+                    </el-button>
+                </template>
+            </el-table-column>
+        </el-table>
 
         <el-dialog v-model="dialogVisible" title="保存" width="30%">
             <span>确定要保存数据吗？</span>
@@ -96,24 +130,12 @@
 <script setup lang="ts" name="basetable">
 import { Ref, onMounted, ref } from 'vue'
 import { useRouter } from 'vue-router'
-import { SeriesItem, fetchSeries, updateImpBodyPartApi, updateImpScanTypeApi } from '../../api/imp/imp'
+import { SeriesItem, SeriesLabelItem, fetchSeries, getSeriesLabelApi, updateImpBodyPartApi, updateImpScanTypeApi } from '../../api/imp/imp'
 import { BodyPartItem, fetchBodyPart } from '../../api/dimension/bodypart'
-import { el, fa } from 'element-plus/es/locale'
-import { ElMessage } from 'element-plus'
+import { ElMessage, ElNotification } from 'element-plus'
 import { ScanTypeItem, fetchScanType } from '../../api/dimension/scantype'
-
-const seriesDetailLabel = {
-    "seriesDescription": "系列描述",
-    "patientNumber": "患者 ID",
-    "patientName": "患者姓名",
-    "patientSex": "性别",
-    "patientAge": "年龄",
-    "institutionName": "机构",
-    "modality": "模态",
-    "shapeInfo": "形状信息",
-    "sliceInfo": "切片信息",
-    "bodyPart": "身体检查部位"
-}
+import { Download, Delete, Edit, Finished } from '@element-plus/icons-vue'
+import { delSeriesLabelApi, downLoadSeriesLabelApi, uploadLabelApi } from '../../api/file/label'
 
 const form: Ref<SeriesItem> = ref({
     seriesNumber: '',
@@ -264,7 +286,7 @@ const updateScanType = () => {
             ]
         }).then(res => {
             if (200 == res.code) {
-                ElMessage.success(`更新身体部位数据成功！`);
+                ElMessage.success(`更新扫描类型数据成功！`);
                 loadSeriesDetail();
             }
         })
@@ -272,12 +294,12 @@ const updateScanType = () => {
 
 }
 
-// const seriesLabel: Ref<GetSeriesLabel[]> = ref([{
-//   id: 0,
-//   fileName: '',
-//   fileLocation: '',
-//   createdAt: ''
-// }])
+const seriesLabel: Ref<SeriesLabelItem[]> = ref([{
+    id: 0,
+    fileName: '',
+    fileLocation: '',
+    createdAt: ''
+}])
 
 // const seriesInstance: Ref<GetSeriesInstance[]> = ref([{
 //   id: 0,
@@ -291,7 +313,7 @@ function init() {
     loadBodyPart()
     loadScanType()
     loadSeriesDetail()
-    //   loadSeriesLabel()
+    loadSeriesLabel()
     //   loadSeriesInstance()
 }
 
@@ -327,10 +349,10 @@ async function loadScanType() {
     scanType.value = data.records;
 }
 
-// async function loadSeriesLabel() {
-//   const { data } = await getSeriesLabel($router.currentRoute.value.params.seriesId as string)
-//   seriesLabel.value = data
-// }
+async function loadSeriesLabel() {
+    const { data } = await getSeriesLabelApi($router.currentRoute.value.params.seriesId as string)
+    seriesLabel.value = data
+}
 
 // async function loadSeriesInstance() {
 //   const { data } = await getSeriesInstance($router.currentRoute.value.params.seriesId as string)
@@ -340,44 +362,42 @@ async function loadScanType() {
 //   })
 // }
 
-// 删除标签
-// function delLabel(fileName: string) {
-//   delSeriesLabelApi($router.currentRoute.value.params.seriesId as string, fileName)
-// }
+// 删除标注文件
+function delLabel(fileName: string) {
+    delSeriesLabelApi($router.currentRoute.value.params.seriesId as string, fileName).then(() => {
+        loadSeriesLabel()
+    })
+}
 
-// function downloadLabel(val: any) {
-//   downLoadSeriesLabelApi(val)
-// }
+// 下载标注文件
+function downloadLabel(fileLocation: string, fileName: string) {
+    ElMessage.success(`正在下载载标注文件：${fileName}`)
+    downLoadSeriesLabelApi(fileLocation)
+}
 
-// const upload = ref<any>()
+const upload = ref<any>()
 
-// 上传标签文件
-// function uploadLabel(param: any) {
+// 上传标注文件
+function uploadLabel(param: any) {
 
-//   const formData = new FormData()
-//   formData.append('file', param.file)
+    const formData = new FormData()
+    formData.append('file', param.file)
 
-//   uploadLabelApi($router.currentRoute.value.params.seriesId as string, formData).then(res => {
-//     console.log(`上传标签文件成功，${res}`)
-//     ElNotification({
-//       message: `${param.file.name} 上传成功！`,
-//       type: 'success',
-//     })
+    uploadLabelApi($router.currentRoute.value.params.seriesId as string, formData).then(res => {
+        console.log(`上传标注文件成功，${res}`)
+        ElMessage.success(`${param.file.name} 上传成功！`)
+        loadSeriesLabel()
+    }).catch(res => {
+        console.error(`上传标注文件失败，${res}`)
+        ElMessage.error(`${param.file.name} 上传失败，${res.response.data.msg}`)
+    })
 
-//   }).catch(res => {
-//     console.error(`上传标签文件失败，${res}`)
-//     ElNotification({
-//       message: `${param.file.name} 上传失败，${res.response.data.msg}`,
-//       type: 'error',
-//     })
-//   })
-
-// }
+}
 
 // 文件发生改变
-// function fileChange() {
-//   upload.value.clearFiles() //清除文件对象
-// }
+function fileChange() {
+    upload.value.clearFiles() //清除文件对象
+}
 
 onMounted(() => {
     init()
@@ -387,5 +407,13 @@ onMounted(() => {
 <style scoped>
 .handle-box {
     margin-bottom: 20px;
+}
+
+.red {
+    color: rgb(233, 67, 67);
+}
+
+.blue {
+    color: #669dfc;
 }
 </style>

@@ -49,6 +49,13 @@ export interface UpdateImpDimensionParams {
     operates: any
 }
 
+export interface SeriesLabelItem {
+    id: number,
+    fileName: string,
+    fileLocation: string,
+    createdAt: string
+}
+
 export async function fetchSimpleSeries(params: SimpleSeriesParams): Promise<ApiResult<SimpleSeriesItem>> {
     return await GET('/imp/series', params);
 }
@@ -63,5 +70,9 @@ export async function updateImpBodyPartApi(params: UpdateImpDimensionParams) {
 
 export async function updateImpScanTypeApi(params: UpdateImpDimensionParams) {
     return await PUT("/imp/scanType", params);
+}
+
+export async function getSeriesLabelApi(seriesId: string): Promise<ApiResult<SeriesLabelItem[]>> {
+    return await GET(`/imp/label/${seriesId}`, null);
 }
 

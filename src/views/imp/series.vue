@@ -96,7 +96,8 @@
             </el-table-column>
             <el-table-column label="操作" width="350" align="center">
                 <template #default="scope">
-                    <el-button v-if="scope.row.isLabelEdit" text :icon="Edit" @click="onLabelSubmit(scope.$index)" v-permiss="16">
+                    <el-button v-if="scope.row.isLabelEdit" text :icon="Edit" @click="onLabelSubmit(scope.$index)"
+                        v-permiss="16">
                         编辑
                     </el-button>
                     <el-button v-else text :icon="Finished" @click="onLabelSubmit(scope.$index)" v-permiss="16">
@@ -105,8 +106,8 @@
                     <el-button text :icon="Delete" class="red" @click="delLabel(scope.$index)" v-permiss="16">
                         删除
                     </el-button>
-                    <el-button text :icon="Download" class="blue" @click="downloadLabel(scope.row.fileLocation, scope.row.fileName)"
-                        v-permiss="15">
+                    <el-button text :icon="Download" class="blue"
+                        @click="downloadLabel(scope.row.fileLocation, scope.row.fileName)" v-permiss="15">
                         下载
                     </el-button>
                 </template>
@@ -137,13 +138,28 @@
             </template>
         </el-dialog>
 
+        <div class="scrollable-container">
+            <div class="scrollable-content">
+                <div v-for="item in seriesInstance" :key="item.id">
+                    <div class="image-container">
+                        <div class="image-text">
+                            Instance Number: {{ item.instanceNumber }}
+                            <br>
+                            Slice Location: {{ item.sliceLocation }}
+                        </div>
+                        <el-image class="img" :src="item.imageUrl" />
+                    </div>
+                </div>
+            </div>
+        </div>
+        
     </div>
 </template>
 
 <script setup lang="ts" name="basetable">
 import { Ref, onMounted, ref } from 'vue'
 import { useRouter } from 'vue-router'
-import { SeriesItem, SeriesLabelItem, fetchSeries, getSeriesLabelApi, updateImpBodyPartApi, updateImpScanTypeApi, updateLabelOrganApi } from '../../api/imp/imp'
+import { SeriesInstanceItem, SeriesItem, SeriesLabelItem, fetchSeries, fetchSeriesInstance, getSeriesLabelApi, updateImpBodyPartApi, updateImpScanTypeApi, updateLabelOrganApi } from '../../api/imp/imp'
 import { BodyPartItem, fetchBodyPart } from '../../api/dimension/bodypart'
 import { ElMessage } from 'element-plus'
 import { ScanTypeItem, fetchScanType } from '../../api/dimension/scantype'
@@ -196,7 +212,7 @@ const onLabelSubmit = (index: number) => {
         labelDialogVisible.value = true;
         editLabel.value = index;
     } else {
-        seriesLabel.value[index].isLabelEdit = ! seriesLabel.value[index].isLabelEdit
+        seriesLabel.value[index].isLabelEdit = !seriesLabel.value[index].isLabelEdit
     }
 }
 
@@ -226,14 +242,14 @@ const updateLabelOrgan = () => {
 
     const labelOrganOperates: any = [];
 
-    seriesLabel.value[editLabel.value].organId.filter(item => ! oldOrgan.value[editLabel.value].includes(item)).filter(item => {
+    seriesLabel.value[editLabel.value].organId.filter(item => !oldOrgan.value[editLabel.value].includes(item)).filter(item => {
         labelOrganOperates.push({
             "op": "ADD",
             "organId": item
         })
     })
 
-    oldOrgan.value[editLabel.value].filter(item => ! seriesLabel.value[editLabel.value].organId.includes(item)).filter(item => {
+    oldOrgan.value[editLabel.value].filter(item => !seriesLabel.value[editLabel.value].organId.includes(item)).filter(item => {
         labelOrganOperates.push({
             "op": "DEL",
             "organId": item
@@ -272,7 +288,7 @@ const updateLabelOrgan = () => {
     //     })
     // }
 
-    seriesLabel.value[editLabel.value].isLabelEdit = ! seriesLabel.value[editLabel.value].isLabelEdit
+    seriesLabel.value[editLabel.value].isLabelEdit = !seriesLabel.value[editLabel.value].isLabelEdit
 }
 
 const updateBodyPart = () => {
@@ -388,13 +404,13 @@ const seriesLabel: Ref<SeriesLabelItem[]> = ref([{
     isLabelEdit: true
 }])
 
-// const seriesInstance: Ref<GetSeriesInstance[]> = ref([{
-//   id: 0,
-//   instanceNumber: 0,
-//   instanceUid: '',
-//   sliceLocation: 0,
-//   imageUrl: ''
-// }])
+const seriesInstance: Ref<SeriesInstanceItem[]> = ref([{
+    id: 0,
+    instanceNumber: 0,
+    instanceUid: '',
+    sliceLocation: 0,
+    imageUrl: ''
+}])
 
 function init() {
     loadBodyPart()
@@ -402,7 +418,7 @@ function init() {
     loadSeriesDetail()
     loadSeriesLabel()
     loadOrgan()
-    //   loadSeriesInstance()
+    loadSeriesInstance()
 }
 
 const $router = useRouter();
@@ -455,13 +471,13 @@ async function loadOrgan() {
     organ.value = data.records;
 }
 
-// async function loadSeriesInstance() {
-//   const { data } = await getSeriesInstance($router.currentRoute.value.params.seriesId as string)
-//   seriesInstance.value = data
-//   seriesInstance.value.forEach(instance => {
-//     instance.imageUrl = '/api/file/jpg/' + instance.id
-//   })
-// }
+async function loadSeriesInstance() {
+    const { data } = await fetchSeriesInstance($router.currentRoute.value.params.seriesId as string)
+    seriesInstance.value = data
+    seriesInstance.value.forEach(instance => {
+        instance.imageUrl = '/api/file/jpg/' + instance.id
+    })
+}
 
 // 删除标注文件
 function delLabel(index: number) {
@@ -506,7 +522,7 @@ onMounted(() => {
 });
 </script>
 
-<style scoped>
+<style scoped lang="less">
 .handle-box {
     margin-bottom: 20px;
 }
@@ -517,5 +533,43 @@ onMounted(() => {
 
 .blue {
     color: #669dfc;
+}
+
+.scrollable-container {
+  overflow-x: auto; /* 水平滚动 */
+  white-space: nowrap; /* 防止换行 */
+  display: flex;
+  align-items: flex-start; /* 顶部对齐 */
+  margin-top: 30px;
+//   margin: 10px;
+}
+
+.scrollable-content {
+  display: flex;
+}
+
+
+.image-container {
+    position: relative;
+    justify-content: center;
+    align-items: center;
+    width: 286px;
+    height: 296px;
+    border: 1px solid #ccc;
+    float: left;
+
+    .image-text {
+        position: absolute;
+        color: #cbcbcb;
+        font-size: 12px;
+        z-index: 1;
+    }
+
+    .img {
+        max-width: 100%;
+        max-height: 100%;
+        z-index: 0;
+    }
+
 }
 </style>

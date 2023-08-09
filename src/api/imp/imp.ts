@@ -58,6 +58,14 @@ export interface SeriesLabelItem {
     isLabelEdit: boolean
 }
 
+export interface SeriesInstanceItem {
+    id: number,
+    instanceNumber: number
+    instanceUid: string
+    sliceLocation: number
+    imageUrl: string
+}
+
 export async function fetchSimpleSeries(params: SimpleSeriesParams): Promise<ApiResult<SimpleSeriesItem>> {
     return await GET('/imp/series', params);
 }
@@ -80,5 +88,9 @@ export async function getSeriesLabelApi(seriesId: string): Promise<ApiResult<Ser
 
 export async function updateLabelOrganApi(params: any) {
     return await PUT("/imp/labelOrgan", params);
+}
+
+export async function fetchSeriesInstance(seriesId: string): Promise<ApiResult<SeriesInstanceItem[]>> {
+    return await GET(`/imp/instance/${seriesId}`, null);
 }
 

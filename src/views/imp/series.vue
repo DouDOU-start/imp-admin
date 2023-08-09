@@ -54,7 +54,7 @@
                     <el-row>
                         <el-col :span="12">
                             <el-form-item label="身体部位：">
-                                <el-select v-model="form.bodyPart" placeholder="暂无数据" :disabled="isEdit">
+                                <el-select v-model="form.bodyPart" placeholder="暂无数据" :disabled="isSeriesEdit">
                                     <el-option v-for="item in bodyPart" :key="item.id" :label="item.bodyName"
                                         :value="item.id" />
                                 </el-select>
@@ -62,7 +62,7 @@
                         </el-col>
                         <el-col :span="12">
                             <el-form-item label="扫描类型：">
-                                <el-select v-model="form.scanType" placeholder="暂无数据" :disabled="isEdit">
+                                <el-select v-model="form.scanType" placeholder="暂无数据" :disabled="isSeriesEdit">
                                     <el-option v-for="item in scanType" :key="item.id" :label="item.scanTypeName"
                                         :value="item.id" />
                                 </el-select>
@@ -71,8 +71,8 @@
                     </el-row>
 
                     <el-form-item>
-                        <el-button v-if="isEdit == true" type="primary" @click="onSubmit">编辑</el-button>
-                        <el-button v-else type="primary" @click="onSubmit">保存</el-button>
+                        <el-button v-if="isSeriesEdit == true" type="primary" @click="onSeriesSubmit">编辑</el-button>
+                        <el-button v-else type="primary" @click="onSeriesSubmit">保存</el-button>
                     </el-form-item>
 
                 </el-form>
@@ -89,20 +89,20 @@
             <el-table-column prop="createdAt" label="上传时间" align="center"></el-table-column>
             <el-table-column label="器官" align="center">
                 <template #default="scope">
-                    <el-select v-model="form.scanType" placeholder="暂无数据" :disabled="isEdit">
-                        <el-option v-for="item in scanType" :key="item.id" :label="item.scanTypeName" :value="item.id" />
+                    <el-select v-model="scope.row.organId" placeholder="暂无数据" :disabled="scope.row.isLabelEdit" multiple>
+                        <el-option v-for="item in organ" :key="item.id" :label="item.organName" :value="item.id" />
                     </el-select>
                 </template>
             </el-table-column>
             <el-table-column label="操作" width="350" align="center">
                 <template #default="scope">
-                    <el-button v-if="true" text :icon="Edit" @click="" v-permiss="16">
+                    <el-button v-if="scope.row.isLabelEdit" text :icon="Edit" @click="onLabelSubmit(scope.$index)" v-permiss="16">
                         编辑
                     </el-button>
-                    <el-button v-else text :icon="Finished" @click="" v-permiss="16">
+                    <el-button v-else text :icon="Finished" @click="onLabelSubmit(scope.$index)" v-permiss="16">
                         保存
                     </el-button>
-                    <el-button text :icon="Delete" class="red" @click="delLabel(scope.row.fileName)" v-permiss="16">
+                    <el-button text :icon="Delete" class="red" @click="delLabel(scope.$index)" v-permiss="16">
                         删除
                     </el-button>
                     <el-button text :icon="Download" class="blue" @click="downloadLabel(scope.row.fileLocation, scope.row.fileName)"
@@ -113,29 +113,43 @@
             </el-table-column>
         </el-table>
 
-        <el-dialog v-model="dialogVisible" title="保存" width="30%">
+        <el-dialog v-model="seriesDialogVisible" title="保存" width="30%">
             <span>确定要保存数据吗？</span>
             <template #footer>
                 <span class="dialog-footer">
-                    <el-button @click="dialogVisible = false">取消</el-button>
+                    <el-button @click="seriesDialogVisible = false">取消</el-button>
                     <el-button type="primary" @click="updateDimension">
                         确认
                     </el-button>
                 </span>
             </template>
         </el-dialog>
+
+        <el-dialog v-model="labelDialogVisible" title="保存" width="30%">
+            <span>确定要保存数据吗？</span>
+            <template #footer>
+                <span class="dialog-footer">
+                    <el-button @click="labelDialogVisible = false">取消</el-button>
+                    <el-button type="primary" @click="updateLabelOrgan">
+                        确认
+                    </el-button>
+                </span>
+            </template>
+        </el-dialog>
+
     </div>
 </template>
 
 <script setup lang="ts" name="basetable">
 import { Ref, onMounted, ref } from 'vue'
 import { useRouter } from 'vue-router'
-import { SeriesItem, SeriesLabelItem, fetchSeries, getSeriesLabelApi, updateImpBodyPartApi, updateImpScanTypeApi } from '../../api/imp/imp'
+import { SeriesItem, SeriesLabelItem, fetchSeries, getSeriesLabelApi, updateImpBodyPartApi, updateImpScanTypeApi, updateLabelOrganApi } from '../../api/imp/imp'
 import { BodyPartItem, fetchBodyPart } from '../../api/dimension/bodypart'
-import { ElMessage, ElNotification } from 'element-plus'
+import { ElMessage } from 'element-plus'
 import { ScanTypeItem, fetchScanType } from '../../api/dimension/scantype'
 import { Download, Delete, Edit, Finished } from '@element-plus/icons-vue'
 import { delSeriesLabelApi, downLoadSeriesLabelApi, uploadLabelApi } from '../../api/file/label'
+import { OrganItem, fetchOrgan } from '../../api/dimension/organ'
 
 const form: Ref<SeriesItem> = ref({
     seriesNumber: '',
@@ -165,29 +179,100 @@ const form: Ref<SeriesItem> = ref({
 // const oldScanType: Ref<number[]> = ref([]);
 const oldBodyPart: Ref<any> = ref()
 const oldScanType: Ref<any> = ref();
+const oldOrgan: Ref<number[][]> = ref([]);
 
 const bodyPart = ref<Array<BodyPartItem>>();
 const scanType = ref<Array<ScanTypeItem>>();
+const organ = ref<Array<OrganItem>>();
 
-const isEdit = ref<Boolean>(true);
-const dialogVisible = ref<Boolean>(false);
+const isSeriesEdit = ref<Boolean>(true);
+const editLabel = ref<number>(-1)
+const seriesDialogVisible = ref<Boolean>(false);
+const labelDialogVisible = ref<Boolean>(false);
 
-const onSubmit = () => {
+const onLabelSubmit = (index: number) => {
 
-    if (isEdit.value == false) {
-        dialogVisible.value = true;
+    if (seriesLabel.value[index].isLabelEdit == false) {
+        labelDialogVisible.value = true;
+        editLabel.value = index;
     } else {
-        isEdit.value = !isEdit.value;
+        seriesLabel.value[index].isLabelEdit = ! seriesLabel.value[index].isLabelEdit
+    }
+}
+
+const onSeriesSubmit = () => {
+
+    if (isSeriesEdit.value == false) {
+        seriesDialogVisible.value = true;
+    } else {
+        isSeriesEdit.value = !isSeriesEdit.value;
     }
 }
 
 const updateDimension = () => {
-    dialogVisible.value = false;
+    seriesDialogVisible.value = false;
 
     updateBodyPart();
     updateScanType();
 
-    isEdit.value = !isEdit.value;
+    isSeriesEdit.value = !isSeriesEdit.value;
+}
+
+const updateLabelOrgan = () => {
+
+    labelDialogVisible.value = false;
+
+    console.log(`当前提交标注文件${editLabel.value}`)
+
+    const labelOrganOperates: any = [];
+
+    seriesLabel.value[editLabel.value].organId.filter(item => ! oldOrgan.value[editLabel.value].includes(item)).filter(item => {
+        labelOrganOperates.push({
+            "op": "ADD",
+            "organId": item
+        })
+    })
+
+    oldOrgan.value[editLabel.value].filter(item => ! seriesLabel.value[editLabel.value].organId.includes(item)).filter(item => {
+        labelOrganOperates.push({
+            "op": "DEL",
+            "organId": item
+        })
+    })
+
+    if (0 != labelOrganOperates.length) {
+        updateLabelOrganApi({
+            "labelId": seriesLabel.value[editLabel.value].id,
+            "operates": labelOrganOperates
+        }).then(res => {
+            if (200 == res.code) {
+                ElMessage.success(`更新标注文件器官数据成功！`);
+                loadSeriesLabel();
+            }
+        })
+    }
+
+    // if (oldOrgan.value[editLabel.value] != seriesLabel.value[editLabel.value].organId) {
+    //     updateLabelOrganApi({
+    //         "labelId": seriesLabel.value[editLabel.value].id,
+    //         "operates": [
+    //             {
+    //                 "op": "ADD",
+    //                 "organId": seriesLabel.value[editLabel.value].organId
+    //             }, {
+    //                 "op": "DEL",
+    //                 "organId": oldOrgan.value[editLabel.value]
+    //             }
+    //         ]
+    //     }).then(res => {
+    //         if (200 == res.code) {
+    //             ElMessage.success(`更新影像器官数据成功！`);
+    //             loadSeriesLabel();
+    //         }
+    //     })
+    // }
+
+    seriesLabel.value[editLabel.value].isLabelEdit = ! seriesLabel.value[editLabel.value].isLabelEdit
 }
 
 const updateBodyPart = () => {
@@ -295,10 +380,12 @@ const updateScanType = () => {
 }
 
 const seriesLabel: Ref<SeriesLabelItem[]> = ref([{
-    id: 0,
+    id: '',
     fileName: '',
     fileLocation: '',
-    createdAt: ''
+    createdAt: '',
+    organId: [],
+    isLabelEdit: true
 }])
 
 // const seriesInstance: Ref<GetSeriesInstance[]> = ref([{
@@ -314,6 +401,7 @@ function init() {
     loadScanType()
     loadSeriesDetail()
     loadSeriesLabel()
+    loadOrgan()
     //   loadSeriesInstance()
 }
 
@@ -352,6 +440,19 @@ async function loadScanType() {
 async function loadSeriesLabel() {
     const { data } = await getSeriesLabelApi($router.currentRoute.value.params.seriesId as string)
     seriesLabel.value = data
+    seriesLabel.value.filter(item => {
+        item.isLabelEdit = true;
+    })
+    // 初始化默认器官数据
+    oldOrgan.value = []
+    seriesLabel.value.filter(item => {
+        oldOrgan.value.push(item.organId)
+    })
+}
+
+async function loadOrgan() {
+    let { data } = await fetchOrgan(null, -1, -1);
+    organ.value = data.records;
 }
 
 // async function loadSeriesInstance() {
@@ -363,8 +464,9 @@ async function loadSeriesLabel() {
 // }
 
 // 删除标注文件
-function delLabel(fileName: string) {
-    delSeriesLabelApi($router.currentRoute.value.params.seriesId as string, fileName).then(() => {
+function delLabel(index: number) {
+    editLabel.value = index
+    delSeriesLabelApi($router.currentRoute.value.params.seriesId as string, seriesLabel.value[index].fileName).then(() => {
         loadSeriesLabel()
     })
 }

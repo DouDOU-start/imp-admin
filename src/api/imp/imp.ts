@@ -50,10 +50,12 @@ export interface UpdateImpDimensionParams {
 }
 
 export interface SeriesLabelItem {
-    id: number,
+    id: string,
     fileName: string,
     fileLocation: string,
-    createdAt: string
+    createdAt: string,
+    organId: number[],
+    isLabelEdit: boolean
 }
 
 export async function fetchSimpleSeries(params: SimpleSeriesParams): Promise<ApiResult<SimpleSeriesItem>> {
@@ -74,5 +76,9 @@ export async function updateImpScanTypeApi(params: UpdateImpDimensionParams) {
 
 export async function getSeriesLabelApi(seriesId: string): Promise<ApiResult<SeriesLabelItem[]>> {
     return await GET(`/imp/label/${seriesId}`, null);
+}
+
+export async function updateLabelOrganApi(params: any) {
+    return await PUT("/imp/labelOrgan", params);
 }
 

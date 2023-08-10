@@ -43,11 +43,11 @@ import { useSidebarStore } from '../store/sidebar';
 import { useRoute } from 'vue-router';
 
 const items = [
-    {
-        icon: 'Odometer',
-        index: '/dashboard',
-        title: '系统首页',
-    },
+    // {
+    //     icon: 'Odometer',
+    //     index: '/dashboard',
+    //     title: '系统首页',
+    // },
     {
         icon: 'Odometer',
         index: '/imp',

@@ -152,7 +152,7 @@
                 </div>
             </div>
         </div>
-        
+
     </div>
 </template>
 
@@ -536,16 +536,19 @@ onMounted(() => {
 }
 
 .scrollable-container {
-  overflow-x: auto; /* 水平滚动 */
-  white-space: nowrap; /* 防止换行 */
-  display: flex;
-  align-items: flex-start; /* 顶部对齐 */
-  margin-top: 30px;
-//   margin: 10px;
+    overflow-x: auto;
+    /* 水平滚动 */
+    white-space: nowrap;
+    /* 防止换行 */
+    display: flex;
+    align-items: flex-start;
+    /* 顶部对齐 */
+    margin-top: 30px;
+    //   margin: 10px;
 }
 
 .scrollable-content {
-  display: flex;
+    display: flex;
 }
 
 

@@ -5,21 +5,21 @@ import Home from '../views/home.vue';
 const routes: RouteRecordRaw[] = [
     {
         path: '/',
-        redirect: '/dashboard',
+        redirect: '/imp',
     },
     {
         path: '/',
         name: 'Home',
         component: Home,
         children: [
-            {
-                path: '/dashboard',
-                name: 'dashboard',
-                meta: {
-                    title: '系统首页',
-                },
-                component: () => import(/* webpackChunkName: "dashboard" */ '../views/dashboard.vue'),
-            },
+            // {
+            //     path: '/dashboard',
+            //     name: 'dashboard',
+            //     meta: {
+            //         title: '系统首页',
+            //     },
+            //     component: () => import(/* webpackChunkName: "dashboard" */ '../views/dashboard.vue'),
+            // },
             {
                 path: '/imp',
                 name: 'imp',

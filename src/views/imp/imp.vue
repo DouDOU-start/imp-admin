@@ -25,38 +25,44 @@
                 <el-input v-model="query.sliceRange" placeholder="切片厚度：0.625（精确过滤），0.625,3（范围过滤）" clearable
                     class="mr10 handle-input" />
             </div>
-            <el-button type="primary" :icon="Search" @click="handleSearch" class="btn">搜索</el-button>
-            <el-upload ref="upload" action="string" :before-upload="onBeforeUploadDicom" :http-request="uploadDicom"
-                :on-change="fileChange" multiple>
-                <el-button type="primary" class="btn">上传影像</el-button>
-            </el-upload>
-        </div>
-        <el-table :data="tableData" border class="table" ref="multipleTable" header-cell-class-name="table-header">
-            <el-table-column prop="seriesId" label="系列 ID" width="100" align="center"></el-table-column>
-            <el-table-column prop="institutionName" label="机构" align="center"></el-table-column>
-            <el-table-column prop="patientNumber" label="患者 ID" align="center"></el-table-column>
-            <el-table-column prop="patientName" label="患者姓名" align="center"></el-table-column>
-            <el-table-column prop="patientSex" label="性别" align="center"></el-table-column>
-            <el-table-column prop="patientAge" label="年龄" align="center"></el-table-column>
-            <el-table-column prop="modality" label="模态" align="center"></el-table-column>
-            <el-table-column prop="sliceThickness" label="切片厚度（mm）" align="center"></el-table-column>
-            <el-table-column prop="bodyPart" label="身体部位" align="center"></el-table-column>
-            <el-table-column prop="scanType" label="扫描类型" align="center"></el-table-column>
-            <el-table-column prop="createdAt" width="200" label="创建时间" align="center"></el-table-column>
-            <el-table-column label="操作" width="200" align="center">
-                <template #default="scope">
-                    <el-button text :icon="Edit" @click="router.push(`/imp/${scope.row.seriesId}`)" v-permiss="15">
-                        详情
-                    </el-button>
-                    <el-button text :icon="Download" @click="handleDownload(scope.row.seriesId)" v-permiss="16">
-                        下载
-                    </el-button>
-                </template>
-            </el-table-column>
-        </el-table>
-        <div class="pagination">
-            <el-pagination background layout="total, prev, pager, next" :current-page="query.currentPage"
-                :page-size="query.pageSize" :total="pageTotal" @current-change="handlePageChange"></el-pagination>
+            <el-row style="width: 350px;">
+                <el-col :span="8"><el-button type="primary" :icon="Search" @click="handleSearch"
+                        class="btn">搜索</el-button></el-col>
+                <el-col :span="8"><el-upload ref="upload" action="string" :before-upload="onBeforeUploadDicom"
+                        :http-request="uploadDicom" :on-change="fileChange" multiple>
+                        <el-button type="primary" class="btn">上传影像</el-button></el-upload></el-col>
+                <el-col :span="8"><el-button type="primary" :icon="Download" @click="handleSearch"
+                        class="btn">批量下载</el-button></el-col>
+            </el-row>
+
+            <el-table :data="tableData" border class="table" ref="multipleTable" header-cell-class-name="table-header">
+                <el-table-column type="selection" width="55" />
+                <el-table-column prop="seriesId" label="系列 ID" width="100" align="center"></el-table-column>
+                <el-table-column prop="institutionName" label="机构" width="130" align="center"></el-table-column>
+                <el-table-column prop="patientNumber" label="患者 ID" align="center"></el-table-column>
+                <el-table-column prop="patientName" label="患者姓名" align="center"></el-table-column>
+                <el-table-column prop="patientSex" label="性别" align="center"></el-table-column>
+                <el-table-column prop="patientAge" label="年龄" align="center"></el-table-column>
+                <el-table-column prop="modality" label="模态" align="center"></el-table-column>
+                <el-table-column prop="sliceThickness" label="切片厚度（mm）" align="center"></el-table-column>
+                <el-table-column prop="bodyPart" label="身体部位" align="center"></el-table-column>
+                <el-table-column prop="scanType" label="扫描类型" align="center"></el-table-column>
+                <el-table-column prop="createdAt" width="200" label="创建时间" align="center"></el-table-column>
+                <el-table-column label="操作" width="200" align="center">
+                    <template #default="scope">
+                        <el-button text :icon="Edit" @click="router.push(`/imp/${scope.row.seriesId}`)" v-permiss="15">
+                            详情
+                        </el-button>
+                        <el-button text :icon="Download" @click="handleDownload(scope.row.seriesId)" v-permiss="16">
+                            下载
+                        </el-button>
+                    </template>
+                </el-table-column>
+            </el-table>
+            <div class="pagination">
+                <el-pagination background layout="total, prev, pager, next" :current-page="query.currentPage"
+                    :page-size="query.pageSize" :total="pageTotal" @current-change="handlePageChange"></el-pagination>
+            </div>
         </div>
     </div>
 </template>
@@ -71,7 +77,7 @@ import { BodyPartItem, fetchBodyPart } from '../../api/dimension/bodypart';
 import { ScanTypeItem, fetchScanType } from '../../api/dimension/scantype';
 import { OrganItem, fetchOrgan } from '../../api/dimension/organ';
 import { fetchModality } from '../../api/dimension/modality';
-import { uploadDicomApi } from '../../api/file/dicom';
+import { downLoadDicomApi, uploadDicomApi } from '../../api/file/dicom';
 import { useRouter } from 'vue-router';
 
 const query = reactive({
@@ -152,13 +158,15 @@ const getData = () => {
         tableData.value = res.data.records;
         tableData.value.forEach((item: any) => {
             item.createdAt = new Date(item.createdAt).toLocaleString('zh-CN').replace(',', '');
+            item.bodyPart = item.bodyPart == null ? "/" : item.bodyPart;
+            item.scanType = item.scanType == null ? "/" : item.scanType;
         })
         pageTotal.value = res.data.total || 0;
     });
 };
 
 onMounted(() => {
-  init()
+    init()
 });
 
 const init = () => {
@@ -214,6 +222,12 @@ function fileChange() {
 
 // 下载影像
 const handleDownload = (seriesId: number) => {
+    ElMessage.success("正在请求下载影像包")
+    downLoadDicomApi(seriesId).then(() => {
+        ElMessage.success("下载影像包成功")
+    }).catch(err => {
+        ElMessage.error("下载影像包失败，请重试")
+    })
     console.log(seriesId)
 };
 
@@ -221,7 +235,7 @@ const handleDownload = (seriesId: number) => {
 
 <style scoped>
 .handle-box {
-    margin-bottom: 20px;
+    margin-bottom: 10px;
 }
 
 .btn {

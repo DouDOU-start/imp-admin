@@ -60,6 +60,30 @@ const routes: RouteRecordRaw[] = [
                 },
                 component: () => import('../views/dimension/scantype.vue'),
             },
+            {
+                path: '/statistics',
+                name: '',
+                meta: {
+                    title: '统计中心',
+                },
+                component: () => import('../views/empty.vue'),
+            },
+            {
+                path: '/admin/user',
+                name: '',
+                meta: {
+                    title: '用户管理',
+                },
+                component: () => import('../views/empty.vue'),
+            },
+            {
+                path: '/admin/permissions',
+                name: '',
+                meta: {
+                    title: '权限管理',
+                },
+                component: () => import('../views/empty.vue'),
+            },
             // {
             //     path: '/table',
             //     name: 'basetable',

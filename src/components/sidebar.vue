@@ -49,12 +49,12 @@ const items = [
     //     title: '系统首页',
     // },
     {
-        icon: 'Odometer',
+        icon: 'MostlyCloudy',
         index: '/imp',
         title: '影像中心',
     },
     {
-        icon: 'Odometer',
+        icon: 'Menu',
         index: '',
         title: '维度管理',
         subs: [
@@ -71,6 +71,21 @@ const items = [
                 title: '扫描类型',
             },
         ],
+    },
+    {
+        icon: 'CollectionTag',
+        index: '/statistics',
+        title: '统计中心',
+    },
+    {
+        icon: 'User',
+        index: '/admin/user',
+        title: '用户管理',
+    },
+    {
+        icon: 'Lock',
+        index: '/admin/permissions',
+        title: '权限管理',
     },
     // {
     //     icon: 'Calendar',

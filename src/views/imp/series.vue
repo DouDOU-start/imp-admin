@@ -549,15 +549,33 @@ onMounted(() => {
 
 .scrollable-content {
     display: flex;
+    padding: 3px;
+    border: 1px solid #ccc;
 }
 
+/* 自定义滚动条样式 */
+.scrollable-container::-webkit-scrollbar {
+    width: 0px;
+    height: 5px;
+}
+
+.scrollable-container::-webkit-scrollbar-thumb {
+    background-color: #a1a1a1;
+    transition: background-color 0.3s ease-in-out;
+    /* 添加过渡效果 */
+}
+
+/* 鼠标悬停时的高亮效果 */
+.scrollable-container::-webkit-scrollbar-thumb:hover {
+    background-color: #8d8c8c;
+}
 
 .image-container {
     position: relative;
     justify-content: center;
     align-items: center;
     width: 286px;
-    height: 296px;
+    height: 286px;
     border: 1px solid #ccc;
     float: left;
 

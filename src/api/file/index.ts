@@ -1,16 +1,17 @@
 import axios from "axios";
 
-export async function DOWNLOAD(url: string) {
+export async function DOWNLOAD(url: string, params: any) {
 
     const downloadAxiosInstance= axios.create({
         baseURL: '/api',
-        timeout: 30000,
+        timeout: 90000,
     });
 
     const response = await downloadAxiosInstance({
         method: 'GET',
         url,
         responseType: 'blob',
+        params: params
     })
 
     const link = document.createElement('a');

@@ -31,11 +31,12 @@
                 <el-col :span="8"><el-upload ref="upload" action="string" :before-upload="onBeforeUploadDicom"
                         :http-request="uploadDicom" :on-change="fileChange" multiple>
                         <el-button type="primary" class="btn">上传影像</el-button></el-upload></el-col>
-                <el-col :span="8"><el-button type="primary" :icon="Download" @click="handleSearch"
+                <el-col :span="8"><el-button type="primary" :icon="Download" @click="handleDownLoadBatch"
                         class="btn">批量下载</el-button></el-col>
             </el-row>
 
-            <el-table :data="tableData" border class="table" ref="multipleTable" header-cell-class-name="table-header">
+            <el-table :data="tableData" border class="table" ref="multipleTable" header-cell-class-name="table-header"
+                @selection-change="handleSelectionChange">
                 <el-table-column type="selection" width="55" />
                 <el-table-column prop="seriesId" label="系列 ID" width="100" align="center"></el-table-column>
                 <el-table-column prop="institutionName" label="机构" width="130" align="center"></el-table-column>
@@ -77,7 +78,7 @@ import { BodyPartItem, fetchBodyPart } from '../../api/dimension/bodypart';
 import { ScanTypeItem, fetchScanType } from '../../api/dimension/scantype';
 import { OrganItem, fetchOrgan } from '../../api/dimension/organ';
 import { fetchModality } from '../../api/dimension/modality';
-import { downLoadDicomApi, uploadDicomApi } from '../../api/file/dicom';
+import { downLoadDicomApi, downLoadDicomBatchApi, uploadDicomApi } from '../../api/file/dicom';
 import { useRouter } from 'vue-router';
 
 const query = reactive({
@@ -154,7 +155,6 @@ const getData = () => {
         scanTypeIds: query.scanTypeIds.length == 0 ? null : query.scanTypeIds.join(","),
         organIds: query.organIds.length == 0 ? null : query.organIds.join(","),
     }).then(res => {
-        console.log(res);
         tableData.value = res.data.records;
         tableData.value.forEach((item: any) => {
             item.createdAt = new Date(item.createdAt).toLocaleString('zh-CN').replace(',', '');
@@ -223,13 +223,34 @@ function fileChange() {
 // 下载影像
 const handleDownload = (seriesId: number) => {
     ElMessage.success("正在请求下载影像包")
-    downLoadDicomApi(seriesId).then(() => {
-        ElMessage.success("下载影像包成功")
+    downLoadDicomApi(seriesId.toString()).then(() => {
+        ElMessage.success("影像包下载成功")
     }).catch(err => {
-        ElMessage.error("下载影像包失败，请重试")
+        ElMessage.error("影像包下载失败，请重试")
     })
     console.log(seriesId)
 };
+
+// 批量下载影像
+const handleDownLoadBatch = () => {
+
+    const seriesIds = multipleSelection.value.map(series => series.seriesId).join(",")
+
+    ElMessage.success("正在请求下载影像包")
+
+    downLoadDicomBatchApi(seriesIds).then(() => {
+        ElMessage.success("影像包下载成功")
+    }).catch(err => {
+        console.error(err)
+        ElMessage.error("影像包下载失败，请重试")
+    })
+}
+
+// 选择发生改变
+const multipleSelection = ref<any[]>([])
+const handleSelectionChange = (val: []) => {
+  multipleSelection.value = val
+}
 
 </script>
 

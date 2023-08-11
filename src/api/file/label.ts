@@ -10,5 +10,5 @@ export async function delSeriesLabelApi(seriesId: string, fileName: string) {
 }
 
 export async function downLoadSeriesLabelApi(fileLocation: string) {
-    await DOWNLOAD(`/file/label/${fileLocation}`);
+    await DOWNLOAD(`/file/label/${fileLocation}`, null);
 }

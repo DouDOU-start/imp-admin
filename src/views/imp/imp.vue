@@ -80,6 +80,8 @@ import { OrganItem, fetchOrgan } from '../../api/dimension/organ';
 import { fetchModality } from '../../api/dimension/modality';
 import { downLoadDicomApi, downLoadDicomBatchApi, uploadDicomApi } from '../../api/file/dicom';
 import { useRouter } from 'vue-router';
+import { set } from '../../utils/nporgress'
+import { useDownloadStore } from '../../store/download'
 
 const query = reactive({
     currentPage: 1,
@@ -222,17 +224,30 @@ function fileChange() {
 
 // 下载影像
 const handleDownload = (seriesId: number) => {
+
+    if ( useDownloadStore().isDownloading ) {
+        ElMessage.info("别着急，当前已有下载任务进行中...")
+        return;
+    }
+    useDownloadStore().handleDownload() 
+    set(0);
     ElMessage.success("正在请求下载影像包")
     downLoadDicomApi(seriesId.toString()).then(() => {
         ElMessage.success("影像包下载成功")
     }).catch(err => {
         ElMessage.error("影像包下载失败，请重试")
     })
-    console.log(seriesId)
 };
 
 // 批量下载影像
 const handleDownLoadBatch = () => {
+    
+    if ( useDownloadStore().isDownloading ) {
+        ElMessage.info("别着急，当前已有下载任务进行中...")
+        return;
+    }
+    useDownloadStore().handleDownload() 
+    set(0);
 
     const seriesIds = multipleSelection.value.map(series => series.seriesId).join(",")
 

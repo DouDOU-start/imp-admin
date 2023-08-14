@@ -1,5 +1,9 @@
 import axios from "axios";
 
+import { set, close } from '../../utils/nporgress'
+
+import { useDownloadStore } from '../../store/download'
+
 export async function DOWNLOAD(url: string, params: any) {
 
     const downloadAxiosInstance= axios.create({
@@ -11,7 +15,13 @@ export async function DOWNLOAD(url: string, params: any) {
         method: 'GET',
         url,
         responseType: 'blob',
-        params: params
+        params: params,
+        onDownloadProgress: (progressEvent) => {
+            const loaded: number = progressEvent.loaded;
+            const total: any = progressEvent.total;
+            const progress: number = Math.round((loaded * 100) / total);
+            set(progress);
+        },
     })
 
     const link = document.createElement('a');
@@ -19,6 +29,9 @@ export async function DOWNLOAD(url: string, params: any) {
     link.setAttribute('download', decodeURIComponent(response.headers['content-disposition'].split('filename=')[1],));
     document.body.appendChild(link);
     link.click();
-    link.remove()
+    link.remove();
+
+    close();
+    useDownloadStore().handleDownload();
 
 }
